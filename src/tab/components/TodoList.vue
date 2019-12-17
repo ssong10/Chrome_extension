@@ -76,7 +76,6 @@
     },
     computed: {
       todosBystatus() {
-        console.log('!!!!')
         // this.status 1) 'active'
         if (this.status === 'active') {
           return this.todos.filter(todo => !todo.completed)
@@ -98,6 +97,7 @@
       }
     },
     mounted: function () { // vue 시작되는 시점
+      this.updateTime()
       this.$options.myInterval = setInterval(this.updateTime, 1000) // 현재시간
       this.todos = todoStorage.fetch()
     },
