@@ -1,7 +1,11 @@
 <template>
   <div id="app">
     <SelectedVideo :video="video"/>
+    <Header />
     <TodoList />
+    <div >
+    <Test :todo="todo" />
+    </div>
   </div>
 </template>
 
@@ -9,17 +13,20 @@
 import axios from 'axios'
 import SelectedVideo from './components/SelectedVideo.vue'
 import TodoList from './components/TodoList.vue'
+import Header from './components/Header.vue'
 const API_KEY = "AIzaSyDpYW9zUVGIXbUot_H7XOgu-Y_Qvb-EIns"
 export default {
   name: 'app',
   components: {
     SelectedVideo,
+    Header,
     TodoList
   },
   data() {
     return {
       YoutubeVideos: [],
       video : null,
+      todos : []
     }
   },
   methods : {

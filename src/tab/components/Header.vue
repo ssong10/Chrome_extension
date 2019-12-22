@@ -1,36 +1,15 @@
 <template>
-    <div>
-  <select style="margin-top:10px;margin-bottom:10px" v-model="status">
-      <option value="all">모두보기</option>
-      <option value="complete">완료</option>
-      <option value="active">할 일</option>
-    </select>
-    <div style="width:300px;opacity:0.4" class="p-3 bg-dark container inline-block;">
-    <!-- <button class="btn btn-secondary" @click="allCompleted">모두 완료</button> -->
-    <button class="btn btn-outline-light" @click="clearCompleted">완료 삭제</button> <br>
-    <ul style="color:#ffffff; display:inline-block;text-align:left">
-      <li style="list-style:none" :style="{'font-size':font}" v-for="todo in todosBystatus"
-        :class="{completed: todo.completed}" :key="todo.id">
-        <input type="checkbox" v-model="todo.completed">
-        {{todo.content}}
-      </li>
-    </ul>
-    <input style="background-color:var(--secondary);border-style:none;color:var(--light)" type="text" aria-describedby="basic-addon1" placeholder="Todo" v-model="newTodo" v-on:keyup.enter="addTodo"><br>
-    </div>
-    </div>
+  <div style="width:100%;text-align:center;display:inline-block;">
+    <h1 :style="{'color':color, 'font-size':headfont }">To Do List</h1>
+    <h3 style="color:var(--warning)">{{time}}</h3>
+  </div>
 </template>
 
 <script>
-  const todoStorage = {
-    fetch() { // 가져오는 작업(JSON -> object 리턴)
-      return JSON.parse(localStorage.getItem('vue-todos') || "[]")
-    },
-    set(todos) { // 로컬스토리지에 저장하는 작업 (object -> JSON)
-      return localStorage.setItem('vue-todos', JSON.stringify(todos))
-    }
-  }
-export default {
-    name : "TodoList",
+
+  export default {
+    name : "Header",
+    props: {}, // 하위 컴포넌트로 데이터 전송
     data: function () {
       return {
         time: '',
@@ -44,56 +23,23 @@ export default {
       }
     },
     methods: {
-      toggleCompleted: function (todo) {
-        todo.completed = !todo.completed
-      },
-      addTodo: function () {
-        this.todos.push({
-          id: Date.now(),
-          content: `${this.newTodo}`,
-          completed: false
-        })
-        this.newTodo = ''
-      },
-      allCompleted: function () {
-        for (todo of this.todos) {
-          todo.completed = true
-        }
-      },
-      clearCompleted() {
-        this.todos = this.todos.filter(todo => {
-          return !todo.completed
-        })
+      updateTime() {
+        const date = new Date()
+        this.time = `${date.getHours()}시 ${date.getMinutes()}분 ${date.getSeconds()}초`
       }
     },
-    watch: { // 특정 data의 변경을 추적, 반응
-      todos: { // todos 를 바라봐!
-        handler: function () {
-          todoStorage.set(this.todos)
-        },
-        deep: true // 원소 자체의 변경 뿐만 아니라, 하위 원소의 변경까지 추적
-      }
+    mounted: function () { // vue 시작되는 시점
+      this.updateTime()
+      this.$options.myInterval = setInterval(this.updateTime, 1000) // 현재시간
     },
-    mounted : function (){ 
-        this.todos = todoStorage.fetch()
-    },
-    computed: {
-      todosBystatus() {
-        // this.status 1) 'active'
-        if (this.status === 'active') {
-          return this.todos.filter(todo => !todo.completed)
-          // 2) complete
-        } else if (this.status === 'complete') {
-          return this.todos.filter(todo => todo.completed)
-          // else all
-        } else {
-          return this.todos
-        }
-      }
-    },
-}
+    beforeDestory: function () {
+      clearInterval(this.$options.myInterval)
+    }
+  }
 </script>
 
-<style>
-
+<style lang="">
+  /* li {
+    color:blue;
+} */
 </style>
