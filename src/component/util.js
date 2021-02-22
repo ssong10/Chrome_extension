@@ -14,5 +14,5 @@ export const setStorage = (key, value) => {
 }
 
 export const getStorage = (key) => {
-  return JSON.parse(window.sessionStorage.getItem(key))
+  return JSON.parse(window.localStorage.getItem(key))
 }

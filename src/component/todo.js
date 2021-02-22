@@ -1,13 +1,29 @@
-import React, { useState } from "react";
+import React, { useState , useEffect } from "react";
 
 export default function Todo(props) {
-  const { todo , onEdit, isEditing, setEditId} = props
-
+  const { todo , onEdit, onDelete, isEditing, setEditId} = props
+  const [editText,setEditText] = useState(todo.title)
   const toggleTodo = (e)=> {
     onEdit({...todo,done:e.target.checked})
   }
-  const editTodo = () => {
-    setEditId(todo.id)
+  const onBlur = () => {
+    setEditText(todo.title)
+    setEditId(null)
+  }
+  const editTodo = (e) => {
+    if (e.keyCode === 27) {
+      e.target.blur()
+      return
+    }
+    if (e.keyCode === 13) {
+      if (e.target.value){
+        onEdit({...todo,title:e.target.value})
+        setEditText(e.target.value)
+        setEditId(null)
+      } else {
+        onDelete(todo)
+      }
+    }
   }
   const wrapClassList = () =>{
     const base = 'todo-wrap'
@@ -15,24 +31,42 @@ export default function Todo(props) {
     const edit = isEditing ? ' editing' : ''
     return base+completed+edit
   }
+  const deleteTodo = () =>{
+    const confirm = window.confirm('지우시겠습니까?')
+    if (confirm){
+      onDelete(todo)
+    }
+  }
+
   return (
-    <div className={wrapClassList()}>
-      <div className="content">
+    <li className="todo">
+      <div className={wrapClassList()}>
+        <div className="content">
+          <input
+            className="checked"
+            type="checkbox"
+            checked={todo.done ? true:false}
+            onChange={toggleTodo}
+          />
+          <label
+            onDoubleClick={()=>setEditId(todo.id)}
+          >
+            {todo.title}
+          </label>
+          <span className="delete" onClick={deleteTodo}>
+            X
+          </span>
+        </div>
         <input
-          className="checked"
-          type="checkbox"
-          checked={todo.done ? true:false}
-          onChange={toggleTodo}
-        />
-        <label
-          onDoubleClick={()=>setEditId(todo.id)}
+          value={editText}
+          onChange={e=>setEditText(e.target.value)}
+          type="text"
+          className="edit"
+          onKeyDown={editTodo}
+          onBlur={onBlur}
         >
-          {todo.title}
-        </label>
-        <span className="delete">X</span>
+        </input>
       </div>
-      <input defaultValue={todo.title} type="text" className="edit">
-      </input>
-    </div>
+    </li>
   )
 }
