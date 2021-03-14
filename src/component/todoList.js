@@ -5,8 +5,8 @@ export default function TodoList() {
   const [todos,setTodos] = useState(getStorage('TODOS') || [])
   const [editId, setEditId] = useState(null)
   const [type,setType] = useState(0)
+  const [dragItem, setDragItem] = useState(null)
   useEffect(()=> {
-    console.log(todos)
     setStorage('TODOS',todos)
   },[todos])
   const shownTodos = () => {
@@ -47,10 +47,37 @@ export default function TodoList() {
       })
     )
   }
+  const onDragEvent = (e) => {
+    e.preventDefault()
+  }
+  const startDrag = (e) => {
+    setDragItem(e.target)
+  }
+  const moveIndex = (from,to) => {
+    const todoList = todos
+    const a = todoList.filter((_,idx) => {
+      if (idx !== from & idx <= to) {
+        return true
+      }
+    })
+    const b = todoList.filter((_,idx)=> {
+      if (idx !== from & idx > to) {
+        return true
+      }
+    })
+    setTodos(a.concat(todoList[from],b))
+  }
+  const dropEvent = (e) =>{
+    const todo = e.target.closest('.todo')
+    const todoNodes = Array.from(dragItem.parentNode.childNodes)
+    const to = todoNodes.indexOf(todo)
+    const from = todoNodes.indexOf(dragItem)
+    moveIndex(from,to)
+  }
   return (
     <div className="todo-list">
       <input className="new-todo" onKeyDown={addTodo} type="text"></input>
-      <ul className="todos">
+      <ul className="todos" onDragStart={startDrag} onDrop={dropEvent} onDragOver={onDragEvent}>
         {shownTodos().map(todo => (
           <Todo
             key={todo.id}

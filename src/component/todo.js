@@ -1,4 +1,4 @@
-import React, { useState , useEffect } from "react";
+import React, { useState , useRef, useEffect } from "react";
 
 export default function Todo(props) {
   const { todo , onEdit, onDelete, isEditing, setEditId} = props
@@ -6,6 +6,12 @@ export default function Todo(props) {
   const toggleTodo = (e)=> {
     onEdit({...todo,done:e.target.checked})
   }
+  const searchElement = useRef(null)
+  useEffect(()=>{
+    if (searchElement.current) {
+      searchElement.current.focus();
+    }
+  },[isEditing])
   const onBlur = () => {
     setEditText(todo.title)
     setEditId(null)
@@ -39,7 +45,7 @@ export default function Todo(props) {
   }
 
   return (
-    <li className="todo">
+    <li className="todo" draggable="true" data-id={todo.id}>
       <div className={wrapClassList()}>
         <div className="content">
           <input
@@ -59,6 +65,7 @@ export default function Todo(props) {
         </div>
         <input
           value={editText}
+          ref={searchElement}
           onChange={e=>setEditText(e.target.value)}
           type="text"
           className="edit"
